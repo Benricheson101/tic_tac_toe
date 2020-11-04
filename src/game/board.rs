@@ -19,18 +19,8 @@ pub struct GameBoard {
 
 impl GameBoard {
   pub fn new(size: usize) -> Self {
-    let mut cells = Vec::<Vec<CellValue>>::new();
-
-    for _ in 0..size {
-      let mut row = Vec::<CellValue>::new();
-      for _ in 0..size {
-        row.push(NA);
-      }
-      cells.push(row);
-    }
-
     Self {
-      cells,
+      cells: vec![vec![NA;size];size],
       size,
     }
   }
@@ -56,7 +46,7 @@ impl GameBoard {
     self.cells[y][x]
   }
 
-  pub fn check_cell(&self, x: usize, y: usize) -> bool {
+  pub fn is_cell_empty(&self, x: usize, y: usize) -> bool {
     x < self.size &&
     y < self.size &&
     self.cells[y][x] == NA
@@ -141,7 +131,19 @@ impl fmt::Display for GameBoard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut out = String::new();
 
-    for row in &self.cells {
+    let mut top_line = String::from(" ");
+
+    for i in 0..self.cells.len() {
+      let digits = i.to_string().len();
+      let spaces = 4 - digits;
+
+      top_line += &(" ".repeat(spaces) + &i.to_string());
+    }
+
+    top_line.push_str("\n");
+    out += &top_line;
+
+    for (i,row) in self.cells.iter().enumerate() {
       let mut r = Vec::<String>::new();
       for c in row {
         r.push(c.to_string());
@@ -149,7 +151,7 @@ impl fmt::Display for GameBoard {
 
       let a = r.join(" | ");
 
-      out += &format!("| {} |\n", a);
+      out += &format!("{} | {} |\n", i, a);
     }
 
     write!(f, "{}", out)

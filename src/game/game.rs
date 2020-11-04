@@ -1,7 +1,11 @@
-use super::GameBoard;
-use super::CellValue;
+use super::{
+  GameBoard,
+  CellValue,
+  clear_screen,
+  prompt,
+};
+
 use CellValue::*;
-use std::io::{self, Write};
 
 pub struct Game {
   pub board: GameBoard,
@@ -24,18 +28,17 @@ impl Game {
 
   pub fn start(&mut self) {
     while !self.ended {
-      Self::clear_screen();
       println!("{}", self.board);
 
-      let row = self.prompt(
-        format!("[{}] row > ", self.curr_player)
+      let row = prompt(
+        &format!("[{}] col > ", self.curr_player)
       );
 
-      let col = self.prompt(
-        format!("[{}] col > ", self.curr_player)
+      let col = prompt(
+        &format!("[{}] row > ", self.curr_player)
       );
 
-      if !self.board.check_cell(row, col) {
+      if !self.board.is_cell_empty(row, col) {
         println!("That cell is either already filled or is outside the board.");
         continue;
       }
@@ -56,43 +59,10 @@ impl Game {
       let tmp = self.curr_player;
       self.curr_player = self.next_player;
       self.next_player = tmp;
+      clear_screen();
     }
-    Self::clear_screen();
+    clear_screen();
     println!("{}", self.board);
     println!("{} wins!", self.winner);
-  }
-
-  fn prompt(&self, prompt: String) -> usize {
-    print!("{}", prompt);
-    io::stdout()
-      .flush()
-      .ok()
-      .unwrap();
-
-    let input = Self::get_input();
-
-    match input {
-      Some(i) => i,
-      None => {
-        println!("Invalid input.");
-        self.prompt(prompt)
-      },
-    }
-  }
-
-  fn get_input() -> Option<usize> {
-    let mut input = String::new();
-    io::stdin()
-      .read_line(&mut input)
-      .expect("failed to read stdin");
-
-    match input.trim().parse::<usize>() {
-      Ok(n) => Some(n),
-      Err(_) => None,
-    }
-  }
-
-  fn clear_screen() {
-    print!("\x1B[2J\x1B[1;1H");
   }
 }

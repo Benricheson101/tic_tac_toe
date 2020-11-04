@@ -1,6 +1,7 @@
 use ttt::*;
 
 fn main() {
-  let mut g = Game::new(2);
-  g.start();
+  clear_screen();
+  let size = prompt("Board size > ");
+  Game::new(size).start();
 }
